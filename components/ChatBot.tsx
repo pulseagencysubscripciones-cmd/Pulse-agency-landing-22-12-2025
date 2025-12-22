@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { GoogleGenAI, Type, FunctionDeclaration } from '@google/genai';
-import { MessageSquare, X, Send, Loader2, Bot, User, CheckCircle2, Globe } from 'lucide-react';
+import { MessageSquare, X, Send, Bot, User, CheckCircle2, Globe } from 'lucide-react';
 import { ChatMessage } from '../types';
 
 const ChatBot: React.FC = () => {
@@ -151,18 +151,26 @@ const ChatBot: React.FC = () => {
     const textPart = msg.parts.find(p => p.text);
     if (!textPart || (msg.role !== 'user' && msg.role !== 'model')) return null;
 
+    const isUser = msg.role === 'user';
+
     return (
-      <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-        <div className={`max-w-[85%] flex items-start space-x-2 ${msg.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''}`}>
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-            msg.role === 'user' ? 'bg-pulseMagenta/20 border border-pulseMagenta/30' : 'bg-white/5 border border-white/10'
+      <div key={idx} className={`flex ${isUser ? 'justify-end' : 'justify-start'} message-enter mb-4`}>
+        <div className={`max-w-[85%] flex items-end gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+          
+          {/* Avatar */}
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg ${
+            isUser 
+              ? 'bg-pulseMagenta/20 border border-pulseMagenta/50' 
+              : 'bg-pulseCyan/20 border border-pulseCyan/50'
           }`}>
-            {msg.role === 'user' ? <User className="w-4 h-4 text-pulseMagenta" /> : <Bot className="w-4 h-4 text-pulseCyan" />}
+            {isUser ? <User className="w-4 h-4 text-pulseMagenta" /> : <Bot className="w-4 h-4 text-pulseCyan" />}
           </div>
-          <div className={`p-4 rounded-2xl text-sm leading-relaxed ${
-            msg.role === 'user' 
-              ? 'bg-pulseMagenta text-white rounded-tr-none' 
-              : 'bg-white/5 border border-white/10 text-gray-300 rounded-tl-none'
+
+          {/* Bubble */}
+          <div className={`px-4 py-3 text-sm leading-relaxed shadow-md ${
+            isUser 
+              ? 'bg-gradient-to-br from-pulseMagenta to-pink-700 text-white rounded-2xl rounded-br-none border border-white/10' 
+              : 'bg-pulseCard border border-white/10 text-gray-300 rounded-2xl rounded-bl-none'
           }`}>
             {textPart.text}
           </div>
@@ -193,9 +201,9 @@ const ChatBot: React.FC = () => {
           isOpen ? 'scale-100 opacity-100' : 'scale-0 opacity-0 pointer-events-none'
         }`}
       >
-        <div className="p-6 border-b border-white/10 bg-gradient-to-r from-pulseCyan/10 to-transparent flex items-center justify-between">
+        <div className="p-6 border-b border-white/10 bg-gradient-to-r from-pulseCyan/10 to-transparent flex items-center justify-between rounded-t-[2rem]">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-pulseCyan/20 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-pulseCyan/20 flex items-center justify-center border border-pulseCyan/30">
               <Bot className="w-6 h-6 text-pulseCyan" />
             </div>
             <div>
@@ -220,15 +228,23 @@ const ChatBot: React.FC = () => {
           )}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-hide">
+        <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
           {messages.map((msg, idx) => renderMessage(msg, idx))}
           
           {isLoading && (
-            <div className="flex justify-start">
-              <div className="bg-white/5 border border-white/10 p-4 rounded-2xl rounded-tl-none flex items-center space-x-3">
-                <Loader2 className="w-4 h-4 text-pulseCyan animate-spin" />
-                <span className="text-xs text-gray-500 font-medium">Procesando consulta...</span>
-              </div>
+             <div className="flex justify-start message-enter mb-4">
+                <div className="max-w-[85%] flex items-end gap-2 flex-row">
+                    {/* Bot Icon */}
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-pulseCyan/20 border border-pulseCyan/50 shadow-lg">
+                        <Bot className="w-4 h-4 text-pulseCyan" />
+                    </div>
+                    {/* Typing Bubble */}
+                    <div className="px-4 py-4 bg-pulseCard border border-white/10 rounded-2xl rounded-bl-none shadow-md flex items-center space-x-1">
+                        <div className="w-2 h-2 bg-pulseCyan/50 rounded-full typing-dot"></div>
+                        <div className="w-2 h-2 bg-pulseCyan/50 rounded-full typing-dot" style={{ animationDelay: '0.2s' }}></div>
+                        <div className="w-2 h-2 bg-pulseCyan/50 rounded-full typing-dot" style={{ animationDelay: '0.4s' }}></div>
+                    </div>
+                </div>
             </div>
           )}
           <div ref={messagesEndRef} />
@@ -241,8 +257,8 @@ const ChatBot: React.FC = () => {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder="Pregunta o escribe tu nombre para agendar..."
-              className="w-full bg-pulseDark border border-white/10 rounded-xl py-3 pl-4 pr-12 text-sm outline-none focus:border-pulseCyan transition-all placeholder:text-gray-600"
+              placeholder="Escribe tu mensaje..."
+              className="w-full bg-pulseDark border border-white/10 rounded-xl py-3 pl-4 pr-12 text-sm outline-none focus:border-pulseCyan transition-all placeholder:text-gray-600 text-white"
             />
             <button
               onClick={handleSendMessage}
