@@ -27,6 +27,7 @@ import CRMDashboard from './components/CRMDashboard';
 import ROICalculator from './components/ROICalculator';
 import Methodology from './components/Methodology';
 import TargetAudience from './components/TargetAudience';
+import ServiceMap from './components/ServiceMap';
 import Footer from './components/Footer';
 import Testimonials from './components/Testimonials';
 import VideoManifesto from './components/VideoManifesto';
@@ -77,6 +78,8 @@ const App: React.FC = () => {
         <Methodology />
         
         <TargetAudience />
+        
+        <ServiceMap />
 
         {/* Final CTA Section / Booking Widget */}
         <section id="agenda" className="py-24 relative overflow-hidden bg-gradient-to-b from-pulseDark to-indigo-950/20">
