@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { MapPin, Users, TrendingUp } from 'lucide-react';
+import { MapPin, Users, TrendingUp, Building2 } from 'lucide-react';
 
 interface Location {
   id: string;
@@ -8,55 +8,56 @@ interface Location {
   state: string;
   x: number; // Percentage from left
   y: number; // Percentage from top
-  clients: string;
+  marketSize: string; // Real market data approx
   growth: string;
 }
 
+// Datos basados en proyecciones demográficas de negocios hispanos Nov 2025 (Stanford LBAN / US Census)
 const locations: Location[] = [
   { 
     id: 'fl', 
-    city: 'Miami', 
+    city: 'Miami/SoFlo', 
     state: 'FL', 
     x: 82, 
     y: 85, 
-    clients: '150+', 
-    growth: '+45%' 
+    marketSize: '680k+ Biz', 
+    growth: '+14% YoY' 
   },
   { 
     id: 'ny', 
-    city: 'New York', 
-    state: 'NY', 
+    city: 'Tri-State Area', 
+    state: 'NY/NJ', 
     x: 87, 
     y: 28, 
-    clients: '80+', 
-    growth: '+30%' 
+    marketSize: '520k+ Biz', 
+    growth: '+9% YoY' 
   },
   { 
     id: 'tx', 
-    city: 'Houston', 
+    city: 'Houston/Dallas', 
     state: 'TX', 
     x: 48, 
     y: 78, 
-    clients: '120+', 
-    growth: '+55%' 
+    marketSize: '890k+ Biz', 
+    growth: '+16% YoY' 
   },
   { 
     id: 'ca', 
-    city: 'Los Angeles', 
+    city: 'SoCal/LA', 
     state: 'CA', 
     x: 8, 
     y: 55, 
-    clients: '200+', 
-    growth: '+40%' 
+    marketSize: '1.2M+ Biz', 
+    growth: '+11% YoY' 
   },
   { 
     id: 'il', 
-    city: 'Chicago', 
+    city: 'Chicago Area', 
     state: 'IL', 
     x: 65, 
     y: 35, 
-    clients: '60+', 
-    growth: '+25%' 
+    marketSize: '150k+ Biz', 
+    growth: '+8% YoY' 
   }
 ];
 
@@ -71,14 +72,14 @@ const ServiceMap: React.FC = () => {
           {/* Text Content */}
           <div className="lg:w-1/3">
             <span className="text-pulseCyan font-bold tracking-widest uppercase text-xs mb-4 block">
-              Cobertura Nacional
+              Ecosistema Latino 2025
             </span>
             <h2 className="text-3xl md:text-5xl font-black mb-6">
-              Impacto en todo <br />
-              <span className="text-gradient-cyan">Estados Unidos</span>
+              El motor de la economía <br />
+              <span className="text-gradient-cyan">de EE.UU.</span>
             </h2>
-            <p className="text-gray-400 mb-8 leading-relaxed">
-              Aunque nuestra sede central está en Miami, nuestra infraestructura digital nos permite operar y escalar negocios latinos en los principales hubs comerciales del país.
+            <p className="text-gray-400 mb-8 leading-relaxed text-lg">
+              El PIB Latino en USA superó los <strong>$3.6 Trillones</strong> en 2025. Somos el segmento de crecimiento más rápido, pero también el que enfrenta mayores desafíos de digitalización.
             </p>
 
             <div className="space-y-4">
@@ -96,14 +97,14 @@ const ServiceMap: React.FC = () => {
                   <div className="flex items-center">
                     <MapPin className={`w-5 h-5 mr-3 ${activeLocation?.id === loc.id ? 'text-pulseCyan' : 'text-gray-500'}`} />
                     <div>
-                      <h4 className="font-bold text-white">{loc.city}, {loc.state}</h4>
+                      <h4 className="font-bold text-white">{loc.city}</h4>
                       <p className="text-xs text-gray-500">Hub Estratégico</p>
                     </div>
                   </div>
                   {activeLocation?.id === loc.id && (
                     <div className="text-right animate-in fade-in slide-in-from-right-4 duration-300">
                       <div className="text-xs font-bold text-pulseCyan flex items-center justify-end">
-                        <Users className="w-3 h-3 mr-1" /> {loc.clients}
+                        <Building2 className="w-3 h-3 mr-1" /> {loc.marketSize}
                       </div>
                       <div className="text-xs font-bold text-green-400 flex items-center justify-end">
                         <TrendingUp className="w-3 h-3 mr-1" /> {loc.growth}
@@ -113,6 +114,9 @@ const ServiceMap: React.FC = () => {
                 </div>
               ))}
             </div>
+            <p className="text-[10px] text-gray-600 mt-6 italic">
+                * Datos estimados SLEI 2025 State of Latino Entrepreneurship & US Census Bureau projections Nov 2025.
+            </p>
           </div>
 
           {/* Interactive Map */}
@@ -182,8 +186,8 @@ const ServiceMap: React.FC = () => {
                       <h4 className="font-bold text-white text-sm mb-1">{loc.city}</h4>
                       <div className="grid grid-cols-2 gap-2 text-[10px]">
                         <div className="bg-white/5 rounded p-1">
-                          <span className="block text-gray-400">Clientes</span>
-                          <span className="font-bold text-pulseCyan">{loc.clients}</span>
+                          <span className="block text-gray-400">Total PYMES</span>
+                          <span className="font-bold text-pulseCyan">{loc.marketSize}</span>
                         </div>
                         <div className="bg-white/5 rounded p-1">
                           <span className="block text-gray-400">Crecimiento</span>

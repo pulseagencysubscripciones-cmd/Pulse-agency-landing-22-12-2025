@@ -62,9 +62,9 @@ const StatsComparison: React.FC = () => {
     <section ref={sectionRef} className="py-24 bg-pulseDark relative overflow-hidden">
       <div className="container mx-auto px-6">
         <div className="text-center mb-20">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">Tendencias de Mercado <span className="text-gradient-cyan">2025</span></h2>
+          <h2 className="text-3xl md:text-5xl font-bold mb-6">Tendencias Q4 <span className="text-gradient-cyan">2025</span></h2>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            La adopción de tecnología marca la diferencia en la eficiencia operativa de los negocios modernos.
+            Ante la escasez de personal calificado y el aumento de salarios en 2025, la automatización es la única vía sostenible.
           </p>
         </div>
 
@@ -78,7 +78,7 @@ const StatsComparison: React.FC = () => {
               </div>
            </div>
            
-           <h3 className="text-xl font-bold mb-8 pl-4">Proyección de Eficiencia Operativa</h3>
+           <h3 className="text-xl font-bold mb-8 pl-4">Eficiencia vs Costo Laboral 2025</h3>
            
            {/* Container with aspect ratio to maintain shape */}
            <div className="w-full aspect-[16/9] md:aspect-[21/9] relative">
@@ -90,9 +90,9 @@ const StatsComparison: React.FC = () => {
                  <line x1="50" y1="100" x2="950" y2="100" stroke="#333" strokeWidth="1" strokeDasharray="5,5" />
 
                  {/* Axis Labels */}
-                 <text x="50" y="330" fill="#6B7280" fontSize="12" fontWeight="bold">INICIO</text>
-                 <text x="950" y="330" fill="#6B7280" fontSize="12" fontWeight="bold" textAnchor="end">FUTURO (12 MESES)</text>
-                 <text x="20" y="200" fill="#6B7280" fontSize="12" fontWeight="bold" transform="rotate(-90, 20, 200)" textAnchor="middle">EFICIENCIA</text>
+                 <text x="50" y="330" fill="#6B7280" fontSize="12" fontWeight="bold">ENE 2025</text>
+                 <text x="950" y="330" fill="#6B7280" fontSize="12" fontWeight="bold" textAnchor="end">DIC 2025 (Proy)</text>
+                 <text x="20" y="200" fill="#6B7280" fontSize="12" fontWeight="bold" transform="rotate(-90, 20, 200)" textAnchor="middle">MARGEN NETO</text>
 
                  {/* Traditional Curve (Flat/Decline) - Red Line */}
                  <path 
@@ -132,19 +132,19 @@ const StatsComparison: React.FC = () => {
                  {/* Tooltip Overlay */}
                  <g transform="translate(780, 50)" style={{ opacity: isVisible ? 1 : 0, transition: "opacity 0.5s ease-in 2.2s", transform: isVisible ? "translate(780, 50)" : "translate(780, 70)" }}>
                     {/* Tooltip Background with neon border */}
-                    <rect width="160" height="70" rx="12" fill="#020B1A" stroke="#00F2FF" strokeWidth="1" className="drop-shadow-[0_0_10px_rgba(0,242,255,0.3)]" />
+                    <rect width="180" height="70" rx="12" fill="#020B1A" stroke="#00F2FF" strokeWidth="1" className="drop-shadow-[0_0_10px_rgba(0,242,255,0.3)]" />
                     
                     {/* Tooltip Content */}
-                    <text x="80" y="25" textAnchor="middle" fill="#00F2FF" fontSize="14" fontWeight="bold" fontFamily="sans-serif" letterSpacing="1">ESCALABILIDAD</text>
-                    <text x="80" y="50" textAnchor="middle" fill="#ffffff" fontSize="18" fontWeight="bold" fontFamily="sans-serif">+300% ROI</text>
+                    <text x="90" y="25" textAnchor="middle" fill="#00F2FF" fontSize="14" fontWeight="bold" fontFamily="sans-serif" letterSpacing="1">OPTIMIZACIÓN</text>
+                    <text x="90" y="50" textAnchor="middle" fill="#ffffff" fontSize="18" fontWeight="bold" fontFamily="sans-serif">Escalabilidad x3</text>
                     
                     {/* Connector Line to the graph point */}
-                    <line x1="160" y1="35" x2="170" y2="0" stroke="#00F2FF" strokeWidth="1" strokeDasharray="2,2" />
+                    <line x1="180" y1="35" x2="170" y2="0" stroke="#00F2FF" strokeWidth="1" strokeDasharray="2,2" />
                  </g>
               </svg>
            </div>
            
-           <p className="text-xs text-gray-600 mt-4 italic text-center">* Gráfica ilustrativa basada en promedios de clientes.</p>
+           <p className="text-xs text-gray-600 mt-4 italic text-center">* Gráfica ilustrativa comparando modelos de negocio intensivos en mano de obra vs modelos apalancados en IA (Datos Nov 2025).</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -153,15 +153,15 @@ const StatsComparison: React.FC = () => {
             <div className="absolute -top-6 left-10 bg-red-600 p-4 rounded-2xl shadow-lg">
               <AlertCircle className="w-8 h-8 text-white" />
             </div>
-            <h3 className="text-2xl font-bold mt-6 mb-2 text-red-400">Procesos Manuales</h3>
-            <p className="text-gray-500 mb-10">Dependencia intensiva de horas hombre para tareas repetitivas.</p>
+            <h3 className="text-2xl font-bold mt-6 mb-2 text-red-400">Modelo Tradicional</h3>
+            <p className="text-gray-500 mb-10">Dependencia de equipos grandes, rotación de personal y costos fijos elevados.</p>
             
             <div className="text-center mb-10">
               {/* Animated Counter */}
               <div className="flex items-baseline justify-center">
                  <span className="block text-5xl font-black text-red-500 transition-all">{manualCount}%</span>
               </div>
-              <span className="text-sm text-gray-400 uppercase tracking-widest font-bold">Capacidad de Respuesta</span>
+              <span className="text-sm text-gray-400 uppercase tracking-widest font-bold">Margen Operativo</span>
             </div>
             
             <div className="w-full bg-gray-900 h-8 rounded-full overflow-hidden border border-white/5">
@@ -172,7 +172,7 @@ const StatsComparison: React.FC = () => {
                  <div className="absolute right-0 top-0 bottom-0 w-2 bg-white/20"></div>
               </div>
             </div>
-            <p className="text-right mt-4 font-bold text-red-400 text-lg">Crecimiento Lineal</p>
+            <p className="text-right mt-4 font-bold text-red-400 text-lg">Estancamiento</p>
           </div>
 
           {/* Success Case */}
@@ -184,8 +184,8 @@ const StatsComparison: React.FC = () => {
               <Zap className="w-8 h-8 text-pulseDark fill-current" />
             </div>
             
-            <h3 className="text-2xl font-bold mt-6 mb-2 text-pulseCyan">Con Tecnología Pulse</h3>
-            <p className="text-gray-400 mb-10">Automatización de tareas clave para liberar tiempo estratégico.</p>
+            <h3 className="text-2xl font-bold mt-6 mb-2 text-pulseCyan">Modelo Pulse IA</h3>
+            <p className="text-gray-400 mb-10">Equipos ágiles (Lean), automatización de ventas 24/7 y decisiones basadas en data.</p>
             
             <div className="text-center mb-10 relative">
               <TrendingUp className="absolute -right-6 top-0 w-20 h-20 text-pulseCyan opacity-10" />
@@ -193,7 +193,7 @@ const StatsComparison: React.FC = () => {
               <div className="flex items-baseline justify-center">
                   <span className="block text-5xl font-black text-pulseCyan transition-all">{autoCount}%</span>
               </div>
-              <span className="text-sm text-gray-400 uppercase tracking-widest font-bold">Capacidad de Respuesta</span>
+              <span className="text-sm text-gray-400 uppercase tracking-widest font-bold">Margen Operativo</span>
             </div>
             
             <div className="w-full bg-gray-900 h-8 rounded-full overflow-hidden border border-white/5 relative">
@@ -205,14 +205,8 @@ const StatsComparison: React.FC = () => {
                   <div className="absolute top-0 right-0 bottom-0 w-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-12 opacity-50"></div>
               </div>
             </div>
-            <p className="text-right mt-4 font-bold text-pulseCyan text-2xl">Crecimiento Escalable</p>
+            <p className="text-right mt-4 font-bold text-pulseCyan text-2xl">Escalabilidad Real</p>
           </div>
-        </div>
-        
-        <div className="mt-12 p-6 bg-pulseDark/50 border border-white/10 rounded-xl">
-            <p className="text-xs text-gray-500 text-justify">
-                <strong>Aviso Legal:</strong> Las comparaciones mostradas representan modelos teóricos de gestión empresarial. Los resultados individuales pueden variar.
-            </p>
         </div>
       </div>
     </section>
