@@ -1,15 +1,23 @@
 
 import React from 'react';
-import { Star, CheckCircle2, ExternalLink } from 'lucide-react';
+import { Star, CheckCircle2, ExternalLink, Quote } from 'lucide-react';
 
 const reviews = [
+  {
+    name: "Carlos G.",
+    company: "Restaurante en Miami",
+    review: "Después del diagnóstico entendí por qué mis campañas no funcionaban. Me lo explicaron claro, con ejemplos de mi negocio. Nunca sentí que me vendían. Solo que me ayudaban.",
+    platform: "google",
+    stars: 5,
+    date: "Hace 1 día"
+  },
   {
     name: "Roberto Garcia",
     company: "Miami Roofing Pro",
     review: "Nuestra organización interna mejoró drásticamente. Ahora tenemos visibilidad de los clientes interesados y no perdemos mensajes.",
     platform: "google",
     stars: 5,
-    date: "Hace 2 días"
+    date: "Hace 3 días"
   },
   {
     name: "Ana Maria Torres",
@@ -34,23 +42,37 @@ const reviews = [
     platform: "trustpilot",
     stars: 5,
     date: "Hace 2 semanas"
-  },
-  {
-    name: "Jorge P.",
-    company: "Real Estate Florida",
-    review: "Dejamos de depender de hojas de cálculo desordenadas. La digitalización fue un paso necesario para nuestra agencia.",
-    platform: "google",
-    stars: 5,
-    date: "Ayer"
   }
 ];
 
 const Testimonials: React.FC = () => {
   return (
     <section className="py-24 bg-pulseDark overflow-hidden relative border-y border-white/5">
-      <div className="container mx-auto px-6 mb-12 text-center">
+      <div className="container mx-auto px-6 mb-16 text-center">
         <h2 className="text-3xl font-bold mb-4">Lo que dicen nuestros <span className="text-gradient-cyan">Clientes</span></h2>
         
+        {/* Featured Testimonial */}
+        <div className="max-w-3xl mx-auto mt-12 mb-16 relative">
+            <div className="absolute -top-6 -left-6 text-pulseCyan/20 transform -scale-x-100">
+                <Quote className="w-16 h-16 fill-current" />
+            </div>
+            <div className="bg-gradient-to-b from-white/10 to-white/5 border border-white/10 p-8 md:p-12 rounded-3xl relative backdrop-blur-md">
+                <p className="text-xl md:text-2xl text-white font-medium italic leading-relaxed mb-6">
+                    "Después del diagnóstico entendí por qué mis campañas no funcionaban. Me lo explicaron claro, con ejemplos de mi negocio. <span className="text-pulseCyan">Nunca sentí que me vendían. Solo que me ayudaban.</span>"
+                </p>
+                <div className="flex items-center justify-center space-x-4">
+                    <div className="w-12 h-12 bg-pulseCyan/20 rounded-full flex items-center justify-center text-pulseCyan font-bold">CG</div>
+                    <div className="text-left">
+                        <div className="font-bold text-white">Carlos G.</div>
+                        <div className="text-sm text-gray-400">Restaurante en Miami</div>
+                    </div>
+                    <div className="flex text-yellow-400">
+                        {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 fill-current" />)}
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div className="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-12 mt-8">
            {/* Google Reviews Link */}
            <a 
