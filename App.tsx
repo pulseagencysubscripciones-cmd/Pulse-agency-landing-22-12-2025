@@ -1,24 +1,11 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { 
-  Rocket, 
-  Cpu, 
-  BarChart3, 
-  Clock, 
   CheckCircle, 
   ArrowRight, 
-  Phone, 
-  Mail, 
-  MapPin, 
-  Zap,
-  TrendingUp,
-  AlertCircle,
   Users,
-  Calendar,
-  Layers,
-  Search,
-  Settings,
-  ClipboardList
+  ClipboardList,
+  CalendarClock
 } from 'lucide-react';
 import Header from './components/Header';
 import Hero from './components/Hero';
@@ -32,28 +19,10 @@ import TargetAudience from './components/TargetAudience';
 import ServiceMap from './components/ServiceMap';
 import Footer from './components/Footer';
 import Testimonials from './components/Testimonials';
-import VideoManifesto from './components/VideoManifesto';
 import AdGenerator from './components/AdGenerator';
-import ChatBot from './components/ChatBot';
 import WhatsAppButton from './components/WhatsAppButton';
 
 const App: React.FC = () => {
-  // Inject Calendly script for the widget to function correctly
-  useEffect(() => {
-    const head = document.querySelector('head');
-    const script = document.createElement('script');
-    script.setAttribute('src', 'https://assets.calendly.com/assets/external/widget.js');
-    script.setAttribute('async', 'true');
-    head?.appendChild(script);
-
-    return () => {
-      // Cleanup if necessary, though usually not needed for external widgets in this context
-      if (head && head.contains(script)) {
-        head.removeChild(script);
-      }
-    };
-  }, []);
-
   return (
     <div className="min-h-screen bg-pulseDark text-white selection:bg-pulseCyan selection:text-pulseDark">
       <Header />
@@ -65,8 +34,6 @@ const App: React.FC = () => {
 
         <StatsComparison />
         
-        <VideoManifesto />
-
         <div id="servicios">
           <Services />
         </div>
@@ -85,15 +52,13 @@ const App: React.FC = () => {
         
         <ServiceMap />
 
-        {/* Final CTA Section / Booking Widget with Qualifier Context */}
         <section id="agenda" className="py-24 relative overflow-hidden bg-gradient-to-b from-pulseDark to-indigo-950/20">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-px bg-gradient-to-r from-transparent via-pulseMagenta to-transparent opacity-50"></div>
           
           <div className="container mx-auto px-6 relative z-10">
-            <div className="grid lg:grid-cols-2 gap-12 items-start">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
                 
-                {/* Left Column: CTA & Qualifier */}
-                <div className="lg:sticky lg:top-24">
+                <div className="lg:pr-8">
                    <div className="inline-flex items-center space-x-2 bg-pulseMagenta/10 border border-pulseMagenta/30 rounded-full px-4 py-1 mb-6">
                         <ClipboardList className="w-4 h-4 text-pulseMagenta" />
                         <span className="text-xs font-bold text-pulseMagenta uppercase tracking-wider">Último Paso</span>
@@ -130,7 +95,7 @@ const App: React.FC = () => {
                    </div>
 
                    <button 
-                     onClick={() => document.querySelector('.calendly-inline-widget')?.scrollIntoView({behavior: 'smooth'})}
+                     onClick={() => window.open('https://calendly.com/pulseagencyllc/30min', '_blank')}
                      className="w-full lg:hidden mb-8 bg-gradient-to-r from-pulseMagenta to-pulsePurple py-4 rounded-xl font-bold text-white shadow-lg flex items-center justify-center"
                    >
                        Quiero claridad en mi negocio <ArrowRight className="ml-2 w-5 h-5" />
@@ -146,20 +111,38 @@ const App: React.FC = () => {
                    </div>
                 </div>
 
-                {/* Right Column: Calendly */}
-                <div className="w-full bg-pulseCard/50 border border-white/10 rounded-3xl overflow-hidden shadow-2xl backdrop-blur-sm relative">
-                    <div className="p-4 bg-pulseDark border-b border-white/5 text-center">
-                        <p className="text-sm font-bold text-gray-300">Selecciona tu horario a continuación</p>
+                <div className="w-full">
+                    <div className="bg-pulseCard/50 border border-white/10 rounded-3xl p-12 flex flex-col items-center justify-center text-center shadow-2xl backdrop-blur-sm relative group hover:border-pulseCyan/50 transition-all duration-500 min-h-[500px]">
+                        <div className="absolute inset-0 bg-gradient-to-b from-pulseCyan/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-3xl"></div>
+                        
+                        <div className="relative z-10">
+                            <div className="w-32 h-32 bg-pulseCyan/10 rounded-full flex items-center justify-center mb-8 mx-auto group-hover:scale-110 transition-transform duration-500 border border-pulseCyan/20 shadow-[0_0_30px_rgba(0,242,255,0.1)]">
+                                <CalendarClock className="w-16 h-16 text-pulseCyan animate-bounce-slow" />
+                            </div>
+                            
+                            <h3 className="text-3xl font-black text-white mb-4">
+                                Tu Agenda Estratégica
+                            </h3>
+                            
+                            <p className="text-gray-400 mb-8 max-w-md mx-auto leading-relaxed">
+                                Selecciona el horario que mejor se adapte a ti para tu sesión de diagnóstico gratuita de 30 minutos.
+                            </p>
+                            
+                            <a 
+                                href="https://calendly.com/pulseagencyllc/30min" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center justify-center px-8 py-5 bg-gradient-to-r from-pulseMagenta to-pulsePurple rounded-xl font-bold text-xl text-white shadow-neon-magenta hover:scale-105 transition-all group-hover:shadow-[0_0_30px_rgba(188,0,109,0.5)]"
+                            >
+                                <CalendarClock className="w-6 h-6 mr-3" />
+                                Reservar Mi Espacio Ahora
+                            </a>
+                            
+                            <p className="mt-6 text-xs text-gray-500">
+                                * Se abrirá en una nueva pestaña segura
+                            </p>
+                        </div>
                     </div>
-                    {/* Loader Placeholder */}
-                    <div className="absolute inset-0 flex items-center justify-center -z-10">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pulseCyan"></div>
-                    </div>
-                    
-                    <div 
-                    className="calendly-inline-widget w-full h-[700px]" 
-                    data-url="https://calendly.com/pulseagencyllc/30min?hide_gdpr_banner=1&background_color=020b1a&text_color=ffffff&primary_color=00f2ff" 
-                    ></div>
                 </div>
 
             </div>
@@ -169,9 +152,7 @@ const App: React.FC = () => {
 
       <Footer />
       
-      {/* Floating Buttons */}
       <WhatsAppButton />
-      <ChatBot />
     </div>
   );
 };

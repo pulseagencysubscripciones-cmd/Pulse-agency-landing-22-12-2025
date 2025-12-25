@@ -28,7 +28,7 @@ const ChatBot: React.FC = () => {
   // Define the tool for saving leads
   const saveLeadFunction: FunctionDeclaration = {
     name: 'saveLeadToGoogleSheets',
-    description: 'Guarda la información de contacto del prospecto en la base de datos de Google Sheets de Pulse Agency.',
+    description: 'Guarda la información de contacto del prospecto en la base de datos de Pulse Agency cuando el usuario proporciona sus datos.',
     parameters: {
       type: Type.OBJECT,
       properties: {
@@ -63,216 +63,213 @@ const ChatBot: React.FC = () => {
           
           REGLA DE ORO: TUS RESPUESTAS DEBEN SER CORTAS, CONCRETAS Y AL GRANO (Máximo 2-3 oraciones).
           - No uses introducciones largas ni saludos repetitivos.
-          - Elimina el "relleno" corporativo, sé directo.
-          
-          TUS SERVICIOS:
-          1. Consultoría IA (Reducción de carga operativa).
-          2. CRM Automatizado (Organización de leads).
-          3. Ads Eficientes (Meta/Google).
+          - Elimina el "relleno" corporativo, sé directo, profesional y empático.
+          - Tu objetivo principal es calificar al usuario y obtener su Nombre y Email para que un consultor humano lo contacte.
+          - Si el usuario muestra interés en precios o servicios, pídele sus datos para enviarle la información detallada.
+          - Cuando tengas el nombre y el email, EJECUTA la función saveLeadToGoogleSheets.
+          `;
 
-          TIENES ACCESO A GOOGLE SEARCH. Úsalo solo si es estrictamente necesario para datos puntuales.
-
-          OBJETIVO PRINCIPAL:
-          Responder la duda puntual y CAPTURAR LEADS. 
-          Si notas interés, pide: Nombre y Email. Luego usa la herramienta 'saveLeadToGoogleSheets' inmediatamente.`;
-
-      const config = {
-        systemInstruction,
-        // Add Google Search to tools combined with function declarations
-        tools: [
-            { functionDeclarations: [saveLeadFunction] }, 
-            { googleSearch: {} }
-        ],
-      };
-
-      // 2. Call the model
+      const model = 'gemini-3-flash-preview';
+      
       const response = await ai.models.generateContent({
-        model: 'gemini-3-pro-preview',
-        contents: currentHistory,
-        config
+        model,
+        contents: currentHistory.map(m => ({
+            role: m.role,
+            parts: m.parts
+        })),
+        config: {
+            systemInstruction,
+            tools: [{ functionDeclarations: [saveLeadFunction] }],
+        }
       });
 
-      const responseContent = response.candidates?.[0]?.content;
-      const functionCalls = response.functionCalls;
+      // Handle the response parts
+      const responseParts = response.candidates?.[0]?.content?.parts || [];
       
-      // 3. Handle Function Calls
-      if (functionCalls && functionCalls.length > 0) {
-        const fc = functionCalls[0]; 
-        
-        if (fc.name === 'saveLeadToGoogleSheets') {
-            console.log('Ejecutando herramienta:', fc.name, fc.args);
-            // Simulate saving data
-            setLeadSaved(true);
-            setTimeout(() => setLeadSaved(false), 5000);
+      // Check for function calls
+      const functionCalls = responseParts.filter(part => part.functionCall);
+      const textParts = responseParts.filter(part => part.text);
 
-            const toolResponseParts = [{
-                functionResponse: {
-                    name: fc.name,
-                    response: { result: { success: true, message: "Lead saved successfully in CRM." } }
-                }
-            }];
+      let finalText = "";
 
-            // Send tool response back to model for final confirmation
-            const historyWithTool: ChatMessage[] = [
-                ...currentHistory,
-                { role: 'model', parts: responseContent?.parts || [] },
-                { role: 'function', parts: toolResponseParts }
-            ];
-
-            const finalResponse = await ai.models.generateContent({
-                model: 'gemini-3-pro-preview',
-                contents: historyWithTool,
-                config
-            });
-            
-            const finalText = finalResponse.text || "Listo, datos guardados. Te contactaremos pronto.";
-
-            setMessages([
-                ...historyWithTool,
-                { role: 'model', parts: [{ text: finalText }] }
-            ]);
-        }
-      } else {
-        // Standard text response (possibly grounded)
-        const text = response.text || "Lo siento, no pude procesar tu solicitud.";
-        setMessages(prev => [...prev, { role: 'model', parts: [{ text }] }]);
+      if (textParts.length > 0) {
+        finalText = textParts.map(p => p.text).join(' ');
       }
 
+      if (functionCalls.length > 0) {
+          for (const call of functionCalls) {
+              const fc = call.functionCall;
+              if (fc && fc.name === 'saveLeadToGoogleSheets') {
+                  // Simulate saving data
+                  console.log("Saving lead:", fc.args);
+                  setLeadSaved(true);
+                  
+                  // In a real app, you would make an API call here.
+                  // We simulate a successful function execution response to the model
+                  
+                  // Construct the history with the function call included
+                  const historyWithFunctionCall = [
+                      ...currentHistory,
+                      { role: 'model', parts: [...responseParts] } // The model's request to call function
+                  ];
+
+                  // Send the function response back to the model
+                  const functionResponsePart = {
+                      functionResponse: {
+                          name: fc.name,
+                          response: { result: "success", message: "Lead saved successfully." }
+                      }
+                  };
+
+                  const followUpResponse = await ai.models.generateContent({
+                      model,
+                      contents: [
+                          ...historyWithFunctionCall.map(m => ({ role: m.role, parts: m.parts })),
+                          { role: 'function', parts: [functionResponsePart] }
+                      ],
+                      config: { systemInstruction }
+                  });
+
+                  const followUpText = followUpResponse.candidates?.[0]?.content?.parts?.[0]?.text;
+                  if (followUpText) {
+                      finalText = followUpText;
+                  } else {
+                      finalText = "¡Perfecto! He guardado tus datos. Un especialista de Pulse Agency te contactará pronto.";
+                  }
+              }
+          }
+      }
+
+      // Append model response
+      setMessages(prev => [
+          ...prev, 
+          { role: 'model', parts: [{ text: finalText }] }
+      ]);
+
     } catch (error) {
-      console.error('Chat Error:', error);
-      setMessages(prev => [...prev, { role: 'model', parts: [{ text: 'Lo siento, estoy teniendo problemas de conexión. Por favor revisa tu API Key o intenta más tarde.' }] }]);
+      console.error("Chat Error:", error);
+      setMessages(prev => [
+        ...prev,
+        { role: 'model', parts: [{ text: 'Lo siento, tuve un pequeño error de conexión. ¿Podrías repetirlo?' }] }
+      ]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Helper to filter messages for rendering
-  const renderMessage = (msg: ChatMessage, idx: number) => {
-    const textPart = msg.parts.find(p => p.text);
-    if (!textPart || (msg.role !== 'user' && msg.role !== 'model')) return null;
-
-    const isUser = msg.role === 'user';
-
-    return (
-      <div key={idx} className={`flex ${isUser ? 'justify-end' : 'justify-start'} message-enter mb-4`}>
-        <div className={`max-w-[85%] flex items-end gap-2 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
-          
-          {/* Avatar */}
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-lg ${
-            isUser 
-              ? 'bg-pulseMagenta/20 border border-pulseMagenta/50' 
-              : 'bg-pulseCyan/20 border border-pulseCyan/50'
-          }`}>
-            {isUser ? <User className="w-4 h-4 text-pulseMagenta" /> : <Bot className="w-4 h-4 text-pulseCyan" />}
-          </div>
-
-          {/* Bubble */}
-          <div className={`px-4 py-3 text-sm leading-relaxed shadow-md ${
-            isUser 
-              ? 'bg-gradient-to-br from-pulseMagenta to-pink-700 text-white rounded-2xl rounded-br-none border border-white/10' 
-              : 'bg-pulseCard border border-white/10 text-gray-300 rounded-2xl rounded-bl-none'
-          }`}>
-            {textPart.text}
-          </div>
-        </div>
-      </div>
-    );
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
   };
 
   return (
     <>
-      <button
+      {/* Trigger Button */}
+      <button 
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-8 right-8 z-[60] w-16 h-16 rounded-full flex items-center justify-center transition-all duration-500 shadow-2xl ${
-          isOpen ? 'bg-pulseDark border border-white/20 rotate-90' : 'bg-gradient-to-r from-pulseCyan to-pulsePurple shadow-neon-cyan hover:scale-110'
-        }`}
+        className="fixed bottom-8 right-8 z-50 bg-pulseCyan text-pulseDark p-4 rounded-full shadow-[0_0_20px_rgba(0,242,255,0.4)] hover:scale-110 transition-transform duration-300 group"
       >
-        {isOpen ? <X className="w-8 h-8 text-white" /> : <MessageSquare className="w-8 h-8 text-pulseDark fill-current" />}
+        {isOpen ? <X className="w-8 h-8" /> : <MessageSquare className="w-8 h-8" />}
         {!isOpen && (
-          <span className="absolute -top-1 -right-1 flex h-4 w-4">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pulseMagenta opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-4 w-4 bg-pulseMagenta"></span>
-          </span>
+            <span className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full animate-pulse border-2 border-pulseDark"></span>
         )}
       </button>
 
-      <div
-        className={`fixed bottom-28 right-8 z-[60] w-[90vw] md:w-[400px] h-[600px] max-h-[70vh] bg-pulseDark/95 backdrop-blur-2xl border border-white/10 rounded-[2rem] shadow-2xl flex flex-col transition-all duration-500 origin-bottom-right ${
-          isOpen ? 'scale-100 opacity-100' : 'scale-0 opacity-0 pointer-events-none'
-        }`}
-      >
-        <div className="p-6 border-b border-white/10 bg-gradient-to-r from-pulseCyan/10 to-transparent flex items-center justify-between rounded-t-[2rem]">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-pulseCyan/20 flex items-center justify-center border border-pulseCyan/30">
-              <Bot className="w-6 h-6 text-pulseCyan" />
-            </div>
-            <div>
-              <h3 className="font-black text-sm tracking-widest uppercase">Pulse Assistant</h3>
-              <div className="flex items-center space-x-3">
-                <div className="flex items-center">
-                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
-                    <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Gemini 3 Pro</span>
+      {/* Chat Window */}
+      {isOpen && (
+        <div className="fixed bottom-28 right-8 z-50 w-[90vw] md:w-[400px] h-[600px] bg-pulseCard/95 border border-white/10 rounded-2xl shadow-2xl backdrop-blur-xl flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 duration-300">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-pulseDark to-[#050f1e] p-4 border-b border-white/10 flex items-center justify-between">
+             <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-pulseCyan/20 rounded-full flex items-center justify-center border border-pulseCyan/30 relative">
+                    <Bot className="w-6 h-6 text-pulseCyan" />
+                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-pulseDark"></div>
                 </div>
-                <div className="flex items-center text-[10px] text-pulseCyan border border-pulseCyan/30 px-1.5 rounded bg-pulseCyan/5">
-                    <Globe className="w-2.5 h-2.5 mr-1" />
-                    ONLINE
+                <div>
+                    <h3 className="font-bold text-white">Pulse Assistant</h3>
+                    <p className="text-xs text-green-400 flex items-center"><Globe className="w-3 h-3 mr-1" /> En línea ahora</p>
                 </div>
-              </div>
-            </div>
+             </div>
+             <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-white">
+                <X className="w-5 h-5" />
+             </button>
           </div>
+
+          {/* Messages Area */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+             {messages.map((msg, idx) => (
+                 <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} message-enter`}>
+                     {msg.role === 'model' && (
+                         <div className="w-8 h-8 bg-pulseCyan/10 rounded-full flex items-center justify-center mr-2 flex-shrink-0 mt-1">
+                             <Bot className="w-4 h-4 text-pulseCyan" />
+                         </div>
+                     )}
+                     <div className={`max-w-[80%] p-3 rounded-2xl text-sm leading-relaxed ${
+                         msg.role === 'user' 
+                         ? 'bg-pulseCyan text-pulseDark font-medium rounded-tr-none' 
+                         : 'bg-white/10 text-gray-200 rounded-tl-none border border-white/5'
+                     }`}>
+                         {msg.parts[0].text}
+                     </div>
+                     {msg.role === 'user' && (
+                         <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center ml-2 flex-shrink-0 mt-1">
+                             <User className="w-4 h-4 text-white" />
+                         </div>
+                     )}
+                 </div>
+             ))}
+             
+             {isLoading && (
+                 <div className="flex justify-start message-enter">
+                     <div className="w-8 h-8 bg-pulseCyan/10 rounded-full flex items-center justify-center mr-2">
+                         <Bot className="w-4 h-4 text-pulseCyan" />
+                     </div>
+                     <div className="bg-white/10 p-4 rounded-2xl rounded-tl-none flex space-x-1 items-center h-10">
+                         <div className="w-2 h-2 bg-gray-400 rounded-full typing-dot"></div>
+                         <div className="w-2 h-2 bg-gray-400 rounded-full typing-dot"></div>
+                         <div className="w-2 h-2 bg-gray-400 rounded-full typing-dot"></div>
+                     </div>
+                 </div>
+             )}
+             <div ref={messagesEndRef} />
+          </div>
+
+          {/* Lead Capture Success Banner */}
           {leadSaved && (
-            <div className="bg-green-500/10 border border-green-500/20 px-3 py-1 rounded-full flex items-center animate-bounce">
-              <CheckCircle2 className="w-3 h-3 text-green-500 mr-2" />
-              <span className="text-[10px] text-green-500 font-bold uppercase">Guardado</span>
-            </div>
+              <div className="bg-green-500/10 border-y border-green-500/20 p-2 flex items-center justify-center text-green-400 text-xs font-bold animate-in fade-in slide-in-from-bottom-4">
+                  <CheckCircle2 className="w-4 h-4 mr-2" /> Datos guardados correctamente
+              </div>
           )}
-        </div>
 
-        <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
-          {messages.map((msg, idx) => renderMessage(msg, idx))}
-          
-          {isLoading && (
-             <div className="flex justify-start message-enter mb-4">
-                <div className="max-w-[85%] flex items-end gap-2 flex-row">
-                    {/* Bot Icon */}
-                    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-pulseCyan/20 border border-pulseCyan/50 shadow-lg">
-                        <Bot className="w-4 h-4 text-pulseCyan" />
-                    </div>
-                    {/* Typing Bubble */}
-                    <div className="px-4 py-4 bg-pulseCard border border-white/10 rounded-2xl rounded-bl-none shadow-md flex items-center space-x-1">
-                        <div className="w-2 h-2 bg-pulseCyan/50 rounded-full typing-dot"></div>
-                        <div className="w-2 h-2 bg-pulseCyan/50 rounded-full typing-dot" style={{ animationDelay: '0.2s' }}></div>
-                        <div className="w-2 h-2 bg-pulseCyan/50 rounded-full typing-dot" style={{ animationDelay: '0.4s' }}></div>
-                    </div>
-                </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-
-        <div className="p-6 bg-white/5 border-t border-white/10 rounded-b-[2rem]">
-          <div className="relative">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder="Escribe tu mensaje..."
-              className="w-full bg-pulseDark border border-white/10 rounded-xl py-3 pl-4 pr-12 text-sm outline-none focus:border-pulseCyan transition-all placeholder:text-gray-600 text-white"
-            />
-            <button
-              onClick={handleSendMessage}
-              disabled={isLoading || !input.trim()}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-pulseCyan rounded-lg flex items-center justify-center text-pulseDark hover:scale-105 transition-transform disabled:opacity-50 disabled:grayscale"
-            >
-              <Send className="w-4 h-4" />
-            </button>
+          {/* Input Area */}
+          <div className="p-4 bg-pulseDark border-t border-white/10">
+             <div className="relative">
+                 <input 
+                    type="text" 
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyPress}
+                    placeholder="Escribe tu mensaje..."
+                    className="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-4 pr-12 text-white placeholder-gray-500 focus:border-pulseCyan outline-none transition-colors"
+                 />
+                 <button 
+                    onClick={handleSendMessage}
+                    disabled={!input.trim() || isLoading}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-pulseCyan rounded-lg text-pulseDark hover:scale-105 disabled:opacity-50 disabled:hover:scale-100 transition-all"
+                 >
+                    <Send className="w-4 h-4" />
+                 </button>
+             </div>
+             <div className="text-center mt-2">
+                 <span className="text-[10px] text-gray-500">
+                     Potenciado por Pulse IA • Respuestas en tiempo real
+                 </span>
+             </div>
           </div>
-          <p className="mt-3 text-[10px] text-center text-gray-600 font-bold uppercase tracking-widest">
-            IA Potenciada por Gemini & Google Search
-          </p>
         </div>
-      </div>
+      )}
     </>
   );
 };

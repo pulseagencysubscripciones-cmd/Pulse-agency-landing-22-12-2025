@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Phone, Menu, X } from 'lucide-react';
+import { Phone, Menu, X, CalendarClock } from 'lucide-react';
 
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -30,7 +30,7 @@ const Header: React.FC = () => {
             <div className="absolute right-0 top-1 w-3 h-3 bg-pulseMagenta rounded-full blur-[2px] animate-pulse"></div>
           </div>
           <span className="text-xl font-bold tracking-wider text-white">
-            PULSE <span className="font-light">AGENCY</span>
+            PULSE AGENCY
           </span>
         </div>
         
@@ -47,8 +47,9 @@ const Header: React.FC = () => {
             href="https://calendly.com/pulseagencyllc/30min"
             target="_blank"
             rel="noopener noreferrer"
-            className={`bg-gradient-to-r from-pulseMagenta to-pulsePurple px-6 rounded-full font-semibold text-white shadow-neon-magenta hover:scale-105 transition-all active:scale-95 flex items-center ${isScrolled ? 'py-2 text-sm' : 'py-3'}`}
+            className={`bg-gradient-to-r from-pulseMagenta to-pulsePurple px-6 rounded-full font-semibold text-white shadow-neon-magenta hover:scale-105 transition-all active:scale-95 flex items-center group ${isScrolled ? 'py-2 text-sm' : 'py-3'}`}
           >
+            <CalendarClock className="w-4 h-4 mr-2 animate-bounce" />
             Reserva Estratégica
           </a>
         </div>
@@ -78,8 +79,9 @@ const Header: React.FC = () => {
               href="https://calendly.com/pulseagencyllc/30min"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full bg-gradient-to-r from-pulseMagenta to-pulsePurple px-6 py-4 rounded-xl font-bold text-white shadow-neon-magenta text-center"
+              className="w-full bg-gradient-to-r from-pulseMagenta to-pulsePurple px-6 py-4 rounded-xl font-bold text-white shadow-neon-magenta text-center flex items-center justify-center"
             >
+              <CalendarClock className="w-5 h-5 mr-2 animate-pulse" />
               Reserva Estratégica
             </a>
           </div>

@@ -42,7 +42,7 @@ const VideoManifesto: React.FC = () => {
                 
                 <div className="bg-white/5 border-l-4 border-pulseCyan p-6 rounded-r-xl mb-8 backdrop-blur-sm">
                     <p className="text-xl text-gray-300 italic font-light leading-relaxed">
-                        "...y el futuro es incierto. En Pulse Agency entendemos que la duda es el costo más alto que paga un empresario hoy en día."
+                        "...y el futuro es incierto. En <span className="text-white font-bold">Pulse Agency</span> entendemos que la duda es el costo más alto que paga un empresario hoy en día."
                     </p>
                 </div>
                 
@@ -69,7 +69,7 @@ const VideoManifesto: React.FC = () => {
                 </button>
             </div>
 
-            {/* Video Player - Contenedor para el archivo pulse-manifesto.mp4 */}
+            {/* Video Player */}
             <div className="relative group order-1 lg:order-2">
                 {/* Glow effect behind video */}
                 <div className="absolute -inset-2 bg-gradient-to-tr from-pulseCyan via-pulsePurple to-pulseMagenta rounded-[2.5rem] blur-xl opacity-30 group-hover:opacity-60 transition duration-1000"></div>
@@ -78,7 +78,7 @@ const VideoManifesto: React.FC = () => {
                     {!isPlaying ? (
                     <>
                         <div className="absolute inset-0">
-                            {/* Poster image that matches the "Office/Suit" aesthetic */}
+                            {/* Poster image */}
                             <img 
                                 src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?q=90&w=1920&auto=format&fit=crop" 
                                 alt="Director de Pulse Agency hablando en oficina moderna" 
@@ -106,9 +106,6 @@ const VideoManifesto: React.FC = () => {
                     </>
                     ) : (
                     <div className="w-full h-full bg-black flex items-center justify-center relative">
-                        {/* 
-                           RECUERDA: Coloca tu archivo 'pulse-manifesto.mp4' en public/assets/video/
-                        */}
                         <video 
                             className="w-full h-full object-cover"
                             controls

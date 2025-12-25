@@ -12,7 +12,7 @@ const Footer: React.FC = () => {
               <div className="relative flex items-center justify-center w-10 h-10 rounded-full border-2 border-pulseCyan">
                 <span className="font-bold text-xl text-white">P</span>
               </div>
-              <span className="text-xl font-bold tracking-wider">PULSE AGENCY IA</span>
+              <span className="text-xl font-bold tracking-wider">PULSE AGENCY</span>
             </div>
             <p className="text-gray-500 text-sm leading-relaxed mb-8">
               Marketing impulsado por IA y Datos para el mercado latino en Estados Unidos. El futuro del marketing es autónomo y nosotros lo construimos para ti.
